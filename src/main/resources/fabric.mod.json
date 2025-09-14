@@ -1,0 +1,31 @@
+{
+    "schemaVersion": 1,
+    "id": "fuse",
+    "version": "${version}",
+    "name": "Fuse",
+    "description": "...",
+    "authors": [
+        "Manchick"
+    ],
+    "contact": {
+        "homepage": "https://fusemc.dev",
+        "sources": "https://github.com/Manchick0/Fuse",
+        "issues": "https://github.com/Manchick0/Fuse/issues"
+    },
+    "license": "Apache-2.0",
+    "icon": "./icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.manchickas.fuse.Fuse"
+        ]
+    },
+    "mixins": [
+        "fuse.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=${loader_version}",
+        "fabric": "*",
+        "minecraft": "${minecraft_version}"
+    }
+}

@@ -12,6 +12,7 @@ import com.manchickas.fuse.exception.ExceptionTemplate;
 import com.manchickas.fuse.exception.ScriptException;
 import com.manchickas.fuse.script.property.Property;
 import com.manchickas.fuse.script.property.operation.Operation;
+import com.manchickas.fuse.script.scheduler.Scheduler;
 import com.manchickas.fuse.std.util.ScriptIdentifier;
 import com.manchickas.fuse.type.codec.JSOps;
 import com.manchickas.marshal.command.CommandPath;
@@ -71,6 +72,7 @@ public final class ScriptLoader extends SinglePreparationResourceReloader<Map<Id
     private final Map<Identifier, Property> properties;
     private final Map<Identifier, NbtElement> stagedProperties;
     private final Map<CommandPath, ScriptCommand.Callback> commands;
+    private final Scheduler scheduler;
 
     public ScriptLoader() {
         this.scripts = new Object2ObjectOpenHashMap<>();
@@ -79,6 +81,7 @@ public final class ScriptLoader extends SinglePreparationResourceReloader<Map<Id
         this.properties = new Object2ObjectOpenHashMap<>();
         this.stagedProperties = new Object2ObjectOpenHashMap<>();
         this.commands = new Object2ObjectOpenHashMap<>();
+        this.scheduler = new Scheduler();
     }
 
     public LiteralArgumentBuilder<ServerCommandSource> buildFuseCommand() {
@@ -115,7 +118,20 @@ public final class ScriptLoader extends SinglePreparationResourceReloader<Map<Id
                                             }
                                             src.sendError(Text.literal("Property '%s' is not declared".formatted(name)));
                                             return -1;
-                                        }))));
+                                        }))))
+                .then(CommandManager.literal("unschedule")
+                        .then(CommandManager.argument("label", IdentifierArgumentType.identifier())
+                                .suggests(this.scheduler)
+                                .executes(ctx -> {
+                                    var label = IdentifierArgumentType.getIdentifier(ctx, "label");
+                                    var source = ctx.getSource();
+                                    if (this.scheduler.unschedule(label)) {
+                                        source.sendMessage(Text.literal("Unscheduled task '%s'".formatted(label)));
+                                        return 1;
+                                    }
+                                    source.sendError(Text.literal("Task '%s' is not scheduled".formatted(label)));
+                                    return -1;
+                                })));
     }
 
     public static ScriptLoader getInstance() {

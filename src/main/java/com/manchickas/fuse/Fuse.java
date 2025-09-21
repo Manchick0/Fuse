@@ -17,7 +17,6 @@ import java.net.URI;
 
 public final class Fuse implements ModInitializer {
 
-    private static final String VERSION = "1.0.0";
     private static final URI HOMEPAGE = URI.create("https://fusemc.dev");
 
     @Override
@@ -39,6 +38,10 @@ public final class Fuse implements ModInitializer {
                         return 1;
                     }));
         });
+    }
+
+    public String fetchLatestVersion() {
+
     }
 
     public static Identifier withPath(String path) {

@@ -1,1 +1,1 @@
-script.on('join', (player) => player.sendMessage('Hello, world!'));
+script.onCommand('/@*/greet/message: position(direct)/', (ctx) => ctx.sendMessage('Hello, world!'))

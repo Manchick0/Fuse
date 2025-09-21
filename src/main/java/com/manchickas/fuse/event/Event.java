@@ -2,13 +2,10 @@ package com.manchickas.fuse.event;
 
 public abstract class Event<L extends EventListener> {
 
-    public Event<L> dispatch(Iterable<EventListener> listeners) {
+    public void tryProcess(EventListener listener) {
         var clazz = this.type().clazz();
-        for (var listener : listeners) {
-            if (clazz.isInstance(listener))
-                this.process(clazz.cast(listener));
-        }
-        return this;
+        if (clazz.isInstance(listener))
+            this.process(clazz.cast(listener));
     }
 
     public abstract void process(L listener);

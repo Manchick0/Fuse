@@ -17,30 +17,26 @@ base {
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
     implementation "org.graalvm.polyglot:polyglot:${project.graal_version}"
     implementation "org.graalvm.js:js-language:${project.graal_version}"
     implementation "com.manchickas:optionated:1.1.0"
-    implementation "com.manchickas:zet:1.1.0"
+    implementation "com.manchickas:zet:1.3.0"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     include "org.graalvm.polyglot:polyglot:${project.graal_version}"
     include "org.graalvm.js:js-language:${project.graal_version}"
-
     include "org.graalvm.sdk:collections:${project.graal_version}"
     include "org.graalvm.sdk:nativeimage:${project.graal_version}"
     include "org.graalvm.sdk:word:${project.graal_version}"
     include "org.graalvm.sdk:jniutils:${project.graal_version}"
-
     include "org.graalvm.truffle:truffle-compiler:${project.graal_version}"
     include "org.graalvm.truffle:truffle-runtime:${project.graal_version}"
     include "org.graalvm.truffle:truffle-api:${project.graal_version}"
-
     include "org.graalvm.regex:regex:${project.graal_version}"
     include "org.graalvm.shadowed:icu4j:${project.graal_version}"
     include "com.manchickas:optionated:1.1.0"
-    include "com.manchickas:zet:1.1.0"
+    include "com.manchickas:zet:1.3.0"
 }
 
 processResources {

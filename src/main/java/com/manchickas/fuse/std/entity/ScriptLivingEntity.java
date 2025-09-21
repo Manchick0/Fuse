@@ -1,4 +1,10 @@
 package com.manchickas.fuse.std.entity;
 
-public final class ScriptLivingEntity {
+import net.minecraft.entity.LivingEntity;
+
+public class ScriptLivingEntity<E extends LivingEntity> extends ScriptEntity<E> {
+
+    protected ScriptLivingEntity(E wrapped) {
+        super(wrapped);
+    }
 }

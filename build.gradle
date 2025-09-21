@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-version = project.mod_version
+version = project.latest
 group = project.maven_group
 
 repositories {
@@ -67,6 +67,11 @@ java {
 }
 
 jar {
+    manifest {
+        attributes(
+                "Implementation-Version": project.latest
+        )
+    }
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
     }

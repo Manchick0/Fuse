@@ -1,47 +1,56 @@
 package com.manchickas.fuse;
 
+import com.manchickas.optionated.option.Option;
 import com.manchickas.optionated.result.Result;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 public record Version(int major, int minor, int patch) implements Comparable<Version> {
 
+    private static final HttpClient CLIENT = HttpClient.newHttpClient();
+    private static final URI UPSTREAM = URI.create("https://raw.githubusercontent.com/Manchick0/Fuse/refs/heads/master/gradle.properties");
     private static final Pattern PATTERN = Pattern.compile("^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$");
-    private static Version current;
 
-    public synchronized static Result<Version> fetchCurrent() {
-        if (Version.current == null) {
-            try(var stream = Fuse.class.getClassLoader()
-                    .getResourceAsStream("version.properties")) {
-                var props = new Properties();
-                props.load(stream);
-                var version = props.getProperty("version");
-                return Result.success(Version.current = Version.parse(version));
-            } catch (IOException e) {
-                return Result.error("Couldn't fetch the current version.");
-            }
-        }
-        return Result.success(Version.current);
+    public static Option<Version> fetchCurrent() {
+        return Version.parse(Fuse.class.getPackage().getImplementationVersion());
     }
 
-    public static Result<Version> fetchLatest() {
-        return Result.error("Not implemented.");
+    public static CompletableFuture<Option<Version>> fetchLatest() {
+        var request = HttpRequest.newBuilder(UPSTREAM).GET()
+                .build();
+        return CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream())
+                .thenApply(response -> {
+                    if (response.statusCode() == 200) {
+                        try(var stream = response.body()) {
+                            var props = new Properties();
+                            props.load(stream);
+                            var version = props.getProperty("latest");
+                            return Version.parse(version);
+                        } catch (IOException ignored) {
+                            // Fallthrough here
+                        }
+                    }
+                    return Option.none();
+                });
     }
 
-    public static Version parse(String source) {
+    public static Option<Version> parse(String source) {
         var matcher = PATTERN.matcher(source);
         if (matcher.matches()) {
             var major = Integer.parseInt(matcher.group("major"));
             var minor = Integer.parseInt(matcher.group("minor"));
             var patch = Integer.parseInt(matcher.group("patch"));
-            return new Version(major, minor, patch);
+            return Option.some(new Version(major, minor, patch));
         }
-        // Domain exception; Not a script one, so no ScriptException here.
-        throw new IllegalArgumentException("Invalid version format");
+        return Option.none();
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.mojang.serialization.Lifecycle;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.SimpleRegistry;
+import net.minecraft.util.Identifier;
 
 public record EventType<L extends EventListener>(Type<L, L> type, Class<L> clazz) {
 
@@ -16,9 +17,16 @@ public record EventType<L extends EventListener>(Type<L, L> type, Class<L> clazz
     public static final Registry<EventType<?>> REGISTRY = new SimpleRegistry<>(EventType.REGISTRY_KEY, Lifecycle.stable());
     public static final Type<EventType<?>, EventType<?>> TYPE = new RegistryType<>(EventType.REGISTRY);
 
-    public static EventType<JoinEvent.Listener> JOIN = EventType.register("join", JoinEvent.Listener.class, "(player: Player) => void");
+    public static EventType<JoinEvent.Listener> JOIN = EventType.register(Identifier.ofVanilla("join"),
+            JoinEvent.Listener.class, "(player: Player) => void");
 
-    private static <L extends EventListener> EventType<L> register(String path, Class<L> clazz, String signature) {
-        return Registry.register(EventType.REGISTRY, Fuse.withPath(path), new EventType<>(new FunctionalType<>(clazz, signature), clazz));
+    private static <L extends EventListener> EventType<L> register(Identifier identifier,
+                                                                   Class<L> clazz,
+                                                                   String signature) {
+        return Registry.register(
+                EventType.REGISTRY,
+                identifier,
+                new EventType<>(new FunctionalType<>(clazz, signature), clazz)
+        );
     }
 }

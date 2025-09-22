@@ -1,7 +1,6 @@
 package com.manchickas.fuse;
 
 import com.manchickas.optionated.option.Option;
-import com.manchickas.optionated.result.Result;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -16,15 +15,15 @@ import java.util.regex.Pattern;
 public record Version(int major, int minor, int patch) implements Comparable<Version> {
 
     private static final HttpClient CLIENT = HttpClient.newHttpClient();
-    private static final URI UPSTREAM = URI.create("https://raw.githubusercontent.com/Manchick0/Fuse/refs/heads/master/gradle.properties");
+    private static final URI REPOSITORY = URI.create("https://raw.githubusercontent.com/Manchick0/Fuse/refs/heads/master/gradle.properties");
     private static final Pattern PATTERN = Pattern.compile("^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)$");
 
-    public static Option<Version> fetchCurrent() {
-        return Version.parse(Fuse.class.getPackage().getImplementationVersion());
+    public static void main(String[] args) {
+        System.out.println(Version.fetchLatest().join());
     }
 
     public static CompletableFuture<Option<Version>> fetchLatest() {
-        var request = HttpRequest.newBuilder(UPSTREAM).GET()
+        var request = HttpRequest.newBuilder(REPOSITORY).GET()
                 .build();
         return CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofInputStream())
                 .thenApply(response -> {
@@ -51,6 +50,11 @@ public record Version(int major, int minor, int patch) implements Comparable<Ver
             return Option.some(new Version(major, minor, patch));
         }
         return Option.none();
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return String.format("%d.%d.%d", this.major, this.minor, this.patch);
     }
 
     @Override

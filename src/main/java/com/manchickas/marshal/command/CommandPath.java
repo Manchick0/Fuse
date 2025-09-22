@@ -44,13 +44,19 @@ public final class CommandPath {
     @SuppressWarnings("unchecked")
     private LiteralArgumentBuilder<ServerCommandSource> build(ScriptCommand.Callback callback) {
         var length = this.segments.length;
-        var builder = this.segments[length - 1].build();
         var parameters = ArrayBuilder.<ParameterSegment>builder(length);
+        var builder = switch (this.segments[length - 1]) {
+            case ParameterSegment seg -> {
+                parameters.append(seg);
+                yield seg.build();
+            }
+            case LiteralSegment seg -> seg.build();
+        };
         if (length > 1) {
             for (var i = this.segments.length - 2; i >= 0; i--) {
                 var segment = this.segments[i];
-                if (segment instanceof ParameterSegment argseg)
-                    parameters.append(argseg);
+                if (segment instanceof ParameterSegment seg)
+                    parameters.append(seg);
                 builder = segment.build().then(builder);
             }
         }

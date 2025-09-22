@@ -14,15 +14,19 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
+import java.time.LocalDate;
+import java.time.Month;
+
 public final class Fuse implements ModInitializer {
 
+    private static final Version VERSION = new Version(1, 0, 0);
     private static final Text PREFIX = Text.literal("🔥 ")
-            .setStyle(Style.EMPTY.withColor(0xcf573c));
+            .setStyle(Style.EMPTY.withColor(0xe9b843));
     private static final Style OUTDATED_MAJOR = Style.EMPTY.withColor(Formatting.RED);
     private static final Style OUTDATED_MINOR = Style.EMPTY.withColor(Formatting.GOLD);
     private static final Style OUTDATED_PATCH = Style.EMPTY.withColor(Formatting.YELLOW);
     private static final Style UP_TO_DATE = Style.EMPTY.withColor(Formatting.GREEN);
-    private static final Style UNRELEASED = Style.EMPTY.withColor(Formatting.BLUE);
+    private static final Style UNRELEASED = Style.EMPTY.withColor(0x5098ef);
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
@@ -37,28 +41,31 @@ public final class Fuse implements ModInitializer {
                     .executes(ctx -> {
                         Version.fetchLatest().thenAccept(result -> {
                             var src = ctx.getSource();
-                            var version = Version.fetchCurrent();
-                            if (version instanceof Some<Version>(var current)) {
-                                var style = result instanceof Some<Version>(var latest)
-                                        ? latest.major() > current.major()
-                                            ? OUTDATED_MAJOR
-                                            : latest.minor() > current.minor()
-                                                ? OUTDATED_MINOR
-                                                : latest.patch() > current.patch()
-                                                    ? OUTDATED_PATCH
-                                                    : current.compareTo(latest) == 0
-                                                        ? UP_TO_DATE
-                                                        : UNRELEASED
-                                        : Style.EMPTY.withColor(Formatting.WHITE);
-                                src.sendMessage(PREFIX.copy().append(Text.literal("You are running version ").formatted(Formatting.GRAY)
-                                        .append(Text.literal(version.toString()).setStyle(style))
-                                        .append(Text.literal(" of the ever-burning flame.").formatted(Formatting.GRAY))));
-                                return;
-                            }
-                            src.sendError(PREFIX.copy().append(Text.literal("Couldn't determine the version of the flame.")));
+                            var style = result instanceof Some<Version>(var latest)
+                                    ? VERSION.compareTo(latest) >= 1
+                                    ? UNRELEASED
+                                    : latest.major() > VERSION.major()
+                                    ? OUTDATED_MAJOR
+                                    : latest.minor() > VERSION.minor()
+                                    ? OUTDATED_MINOR
+                                    : latest.patch() > VERSION.patch()
+                                    ? OUTDATED_PATCH
+                                    : UP_TO_DATE
+                                    : Style.EMPTY.withColor(Formatting.WHITE);
+                            src.sendMessage(PREFIX.copy().append(Text.literal("You are running version ").formatted(Formatting.GRAY)
+                                    .append(Text.literal(VERSION.toString()).setStyle(style))
+                                    .append(Text.literal(" of the ever-burning flame.").formatted(Formatting.GRAY))));
                         });
-                        return 0;
+                        return 1;
                     }));
+            var date = LocalDate.now();
+            if (date.getMonth() == Month.APRIL && date.getDayOfMonth() == 1)
+                dispatcher.register(CommandManager.literal("icanhasbukkit")
+                        .executes((ctx) -> {
+                            var src = ctx.getSource();
+                            src.sendMessage(Text.literal("No, you cannot.").formatted(Formatting.RED));
+                            return 1;
+                        }));
         });
     }
 

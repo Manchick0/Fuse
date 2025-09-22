@@ -67,11 +67,6 @@ java {
 }
 
 jar {
-    manifest {
-        attributes(
-                "Implementation-Version": project.latest
-        )
-    }
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
     }

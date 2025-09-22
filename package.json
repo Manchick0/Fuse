@@ -1,0 +1,9 @@
+{
+  "name": "fuse-declaration",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "Manchick",
+  "license": "MIT",
+  "packageManager": "pnpm@10.15.1"
+}
